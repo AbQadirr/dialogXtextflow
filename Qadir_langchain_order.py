@@ -1,188 +1,107 @@
-from config import All_keys
-from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import TextLoader
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Pinecone
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
-import pinecone
 import streamlit as st
-import tempfile
-import os
-                            
-model=ChatOpenAI(openai_api_key=All_keys.Openai_API_KEY,temperature=0.2,model='gpt-4',max_tokens=2000)# add further parameters as per user preference
-embeddings = OpenAIEmbeddings(openai_api_key=All_keys.Openai_API_KEY)
-PINECONE_API_KEY = All_keys.PINECONE_API_KEY
-PINECONE_API_ENV = All_keys.PINECONE_API_ENV
-
-book=[] #creation of main book
-all_personas=[] #all personas stored here
-
-chatmemory = ConversationBufferWindowMemory(k=3)
-
-
-class Bot:
-    def __init__(self,**kwargs) -> None:
-        self.name=kwargs['name']
-        self.characteristics=kwargs['characteristics']
-        self.interests=kwargs['interests']
-        self.knowledge_file=kwargs['knowledge_file']
-
-    def knowledge(self,kpath):
-        loader=TextLoader(file_path=kpath)
-        data=loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50)
-        texts = text_splitter.split_documents(data)
-        # initialize pinecone
-        pinecone.init(
-            api_key=PINECONE_API_KEY,  # find at app.pinecone.io
-            environment=PINECONE_API_ENV  # next to api key in console
-        )
-        index = "bookbots" # put in the name of pinecone index
-        docsearch = Pinecone.from_documents(texts, embeddings, index_name=index)
-        return docsearch
-    
-    def generate_prompt(self,other_model_input:str)->None:
-       
-        if len(other_model_input)==0:
-            other_model_input='Start a story for a book'
-
-        query=f"""
-            %INSTRUCTIONS:
-                Suppose that event has occured as follows:
-                "{other_model_input}"      
-                After that tell us what is likely to occur next from the information given.         
-                Write this one sentence such that its tone matches a persona with Interests in:
-                    {self.interests}. 
-                Write this one sentence such that its tone matches a persona characteristics as given:
-                    {self.characteristics}.
-                Write this one sentence such that a book is being written.
-            %RESTRICTIONS:
-                IMPORTANT :: Aim strictly for one easy short sentence with subject object and verb."""
-        
-        qa_chain = RetrievalQA.from_chain_type(
-        model,
-        retriever=self.knowledge(self.knowledge_file).as_retriever(search_type="similarity", search_kwargs={"k": 4}),
-        chain_type="stuff",memory=chatmemory)
-        response=qa_chain.run({"query":query})
-        return response
-
-def init_conversation2(bot1:Bot,bot2:Bot,res):
-    res=(f"{bot2.generate_prompt(res).split('.')[0]}.")
-    book.append(f"Persona {bot2.name} : {res}")
-    st.text_area('PERSONA1',value=f"Persona {bot2.name} : {res}")
-    print('\n'.join(book[-1:]))
-    init_conversation1(bot1,bot2,res)
-    return 0
-
-def init_conversation1(bot1:Bot,bot2:Bot,res):
-    res= (f"{bot1.generate_prompt(res).split('.')[0]}.")
-    print(f"asdasd ::: {res}")
-    book.append(f"Persona {bot1.name} : {res}")
-    st.text_area("PERSONA2",value=f"Persona {bot1.name} : {res}")
-    print('\n'.join(book[-1:]))
-    init_conversation2(bot1,bot2,res)
-    return 0
-
-def init_conv(botnum:int,persona1:Bot,persona2:Bot,topic:str):
-    init_conversation1(persona1,persona2,topic) if botnum==1 else init_conversation2(persona1,persona2,topic)
-
-
-def edit_book(line_num:int,newcontent:str):
-    book=book[:line_num-1]+newcontent+book[line_num+1:]
-    return f'Book edited at line {line_num}'
-
-def createpersona(**kwargs)->str:
-    newbot=Bot(**kwargs)
-    all_personas.append(newbot)
-    return all_personas[-1]
-
-def choose_persona():
-    return all_personas
-
-
-def main():
-
-    st.title("Persona Input App")
-    st.sidebar.header("Persona 1")
-    
-    persona1_name = st.sidebar.text_input("Name:", value="A")
-    persona1_characteristics = st.sidebar.text_input("Characteristics:", "e.g. It is usually angry")
-    persona1_interests = st.sidebar.text_input("Interests:", "e.g It likes to fight alot")
-    
-    uploaded_file = st.sidebar.file_uploader("Choose a .txt file", type=["txt"], key='text1')
-    if uploaded_file is not None:
-        try:
-            data=uploaded_file.read().decode('utf-8')
-            with open('file1.txt','w') as f:
-                f.write(data)
-        except FileNotFoundError:
-            st.error("File not found. Please upload a valid text file.")
-
-
-    # print(f"path is :: {data.decode('utf-8')}")
-    
-    
-    st.sidebar.header("Persona 2")
-    persona2_name = st.sidebar.text_input("Name2:", value="B")
-    persona2_characteristics = st.sidebar.text_input("Characteristics2:", "e.g. It is usually happy")
-    persona2_interests = st.sidebar.text_input("Interests2:", "e.g. It likes to make friends")
-    
-    uploaded_file = st.sidebar.file_uploader("Choose a .txt file", type=["txt"], key='text2')
-    if uploaded_file is not None:
-        try:
-            data=uploaded_file.read().decode('utf-8')
-            with open('file2.txt','w') as f:
-                f.write(data)
-        except FileNotFoundError:
-            st.error("File not found. Please upload a valid text file.")
-    
-    persona1=createpersona(name=persona1_name,
-                        characteristics=persona1_characteristics,
-                        interests=persona1_interests,
-                        knowledge_file='file1.txt')
-    
-    
-    persona2=createpersona(name=persona2_name,
-                        characteristics=persona2_characteristics,
-                        interests=persona2_interests,
-                        knowledge_file='file2.txt')
-    
-    
-    
-
-
-
-
-    input_text = st.text_input("You:", placeholder="Write story starting e.g.a person goes out for fishing.", key="input")
+import firebase_admin
+from mcode import main_page
+from firebase_admin import credentials
+from firebase_admin import auth
  
-    if st.button("Submit", type="primary"):
-        # Generate response and append to the conversation history
-        response =  init_conv(1,persona1, persona2, input_text)
-    
 
-   
+    # If not initialized, initialize it with a unique app name
+if not firebase_admin._apps:    
+    cred = credentials.Certificate('dialogtextflow-a98bd48defb4.json')
+    firebase_admin.initialize_app(cred)
+    # auth = firebase_admin.auth()
+
+
+# if 'user_authenticated' not in st.session_state:
+#     st.session_state.user_authenticated = False
+        
+        
+def app():
+    
+    
+# Usernm = []
+    # st.title('Welcome to :violet[Pondering] :sunglasses:')
+
+    if 'username' not in st.session_state:
+        st.session_state.username = ''
+    if 'useremail' not in st.session_state:
+        st.session_state.useremail = ''
+
+
+
+    def f(): 
+        try:
+            user = auth.get_user_by_email(email)
+            print(user.uid)
+            st.session_state.username = user.uid
+            st.session_state.useremail = user.email
+            
+            global Usernm
+            Usernm=(user.uid)
+            
+            st.session_state.signedout = True
+            st.session_state.signout = True    
   
+            
+        except: 
+            st.warning('Login Failed')
+
+    def t():
+        st.session_state.signout = False
+        st.session_state.signedout = False   
+        st.session_state.username = ''
 
 
+        
+    
+        
+    if "signedout"  not in st.session_state:
+        st.session_state["signedout"] = False
+    if 'signout' not in st.session_state:
+        st.session_state['signout'] = False    
+        
 
+        
+    
+    if  not st.session_state["signedout"]: # only show if the state is False, hence the button has never been clicked
+        choice = st.selectbox('Login/Signup',['Login','Sign up'])
+        email = st.text_input('Email Address')
+        password = st.text_input('Password',type='password')
+        
 
+        
+        if choice == 'Sign up':
+            username = st.text_input("Enter  your unique username")
+            
+            if st.button('Create my account'):
+                user = auth.create_user(email = email, password = password,uid=username)
+                
+                st.success('Account created successfully!')
+                st.markdown('Please Login using your email and password')
+                st.balloons()
+        else:
+            # st.button('Login', on_click=f)          
+            st.button('Login', on_click=f)
+            # main_page()
+            
+            
+            
+    if st.session_state.signout:                
+        main_page()
 
-if __name__=="__main__":
-    main()
-    # persona1=createpersona(name='A',characteristics='it is usually angry',interests='it likes to watch action movies',knowledge_file='knowledge1.txt')
-    # persona2=createpersona(name='B',characteristics='it is usually happy',interests='it likes to watch underage kids cartoons',knowledge_file='knowledge2.txt')
+       
+        
+        # st.sidebar.button('Sign out', on_click=t, key='t')
+        
+        # # var logoutButton = document.createElement('button');
+ 
+        
     
-    # # print(persona1.knowledge(kpath="knowledge1.txt",query='person'))
-    
-    # topic='Ben goes outside with his girlfriend'
-    # # while(True):
-    # #     init_conversation1(persona1,persona2,'Ben goes outside with his girlfriend')
-    
-    # init_conv(1,persona1,persona2,topic)
-    
-    
+                
     
 
+                            
+    def ap():
+        st.write('Posts')
+        
+app()
