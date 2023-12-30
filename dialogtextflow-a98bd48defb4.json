@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "dialogtextflow",
+  "private_key_id": "a98bd48defb48bd6b9f34bba31aa138ef5aa3cfb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCmCF3utDsxAweQ\nuMGe2PsB70R8U+2B8nj6i6CYWWdga8eNBEoKuqihOhvNUHDr2A3m8yKt8p0JOnMm\nVctzatcsbNFs4lYa+eMErbXitNpNHehERZ2DfJjU3tUgxvBtukgTdtR5DHGLKIMi\nJ6QEnRg0B6kZaXPWO6gJVBhdRHAKqCgQQ+MG6X3Cqk+vWK4n1IIOdlPkzq951D1T\noOaZHf56Gm7AmqTtCXh+rIHGlSCq4+6ebYpwJrXTHrlvLlgT/aIgz8L8eF0xkE0h\nYxBi+6bxUQOsRYF2+dnUEh1qzRSwqp92HwHE5JQ3DwuGB2fdQTLZthKbOy3FBIw9\nAmLLPNz5AgMBAAECggEABxjtdwJCU36HKMMVF8a7uCHzwgLOcNMeI8urMkgEGMWS\nsq7/wUSoZ7f1r0mkghhqw7gZ/+iSmO3kNTvOpiDnkNEYBLkKKD4NW8pXL5k+ibRh\nFOYK7S960wKxhqSqa25enWJjg8cp5WJ2dJPQOZhDjBnVuy3cU0iajseHARmnVnU3\nBCwnR1imIaZvOdg7XJaTvcHXI+Vqpt8AH68X9aOjXEPbjjq2rTDd9GA8dtpgQKcr\nMgrqUgUaDY/f/bFhvj4NVhdmsW1/5o5X9DdkxKooJIUNHv12DtT7tVMZ3ZT4H3Ou\n8zelY5jzKafzdWqX7ST7sBx4tVP3mT2rcxltbmiI1wKBgQDk6ypPMIiUpGU55m2a\nIrAX9Nzq0itirsZ6ViKJ3eWIQwSzMPopt4f50iFssjkiKXSwlq94TwCsnLZn7GTe\njlJekUMdW6qu3OOUoNSmN1h0u5T3QfvBAWfz59ze4QFRLGG3dSscQ+XY//BjoJY8\n6QL3Nz4EbcBThtCvI/VcXlDNCwKBgQC5rLEW4DVeybEnHxfV2kpxp2m4O0vvycKx\nnHlqJJKENIGfaH3nF2RsPSJUiNZXgbdDZv7fGZI5COgzB5K+gJ27h3DLv8N2T1o0\nOYXH3/tlI03JP1UIZNf7jTDLhTJF4IEozQpSCmYmNg75SCxILH7aiQFS9YoenyHA\nypEoQD2YiwKBgQDeMAre1eKbM300150l7+kvN3F9UgTeQXlPoG7hlciFm1biffUx\nrHuEVRowIEQoDki+ZWNmyHeFEo5RDDdTdJwqQZ/8zM477xXNWtVLh4iJtM//tcGf\nMbguGqxcf9QBb6xgno77XkOnfbNbX7Cy6g8A2FOPhN8Zs061z5cE0l5mxQKBgDY0\nD86ZzXrKboj5LsAjZbAgK2C5DsYFpGytPVSbMJqfqWeb3YVk8tAWWLtM5yXMnG90\n1drTYDh+PSsIfvJWIbXpKCiS5sDXEYJFeKSM4pr333Fsp6o3pkWtRh1j2PVFQO9k\nTCr/Fir5hQ2I4ESBmNa7QEOzooql8fiSKiYR+ulZAoGAPnBMrgHPMugltbfloQDG\njY5o/tM3zpfjF9UPN1lsh9rqkwqYXeys2ygSosuycMzWiFSMpcH9yFcNXL4qWM0S\ns4UXlx5/2woKjSLsBsdRz8sD3NKx9cNvTM5OPIDsew+5UZgCnwCEKs41WdJrMQMK\n1NqKU7gAg1wKr322ZTIryXY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-rpazh@dialogtextflow.iam.gserviceaccount.com",
+  "client_id": "116515557124008216097",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-rpazh%40dialogtextflow.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
