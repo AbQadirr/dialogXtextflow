@@ -12,7 +12,7 @@ import streamlit as st
 import tempfile
 import os
                             
-model=ChatOpenAI(openai_api_key=All_keys.Openai_API_KEY,temperature=0.5,model='gpt-4',max_tokens=2000)# add further parameters as per user preference
+model=ChatOpenAI(openai_api_key=All_keys.Openai_API_KEY,temperature=0.2,model='gpt-4',max_tokens=2000)# add further parameters as per user preference
 embeddings = OpenAIEmbeddings(openai_api_key=All_keys.Openai_API_KEY)
 PINECONE_API_KEY = All_keys.PINECONE_API_KEY
 PINECONE_API_ENV = All_keys.PINECONE_API_ENV
@@ -50,16 +50,17 @@ class Bot:
             other_model_input='Start a story for a book'
 
         query=f"""
-            %INSTRUCTIONS:      
-                After {other_model_input} tell us what happens in one sentence.         
-                Change this one sentence such that you are an a persona with Interests in:
+            %INSTRUCTIONS:
+                Suppose that event has occured as follows:
+                "{other_model_input}"      
+                After that tell us what is likely to occur next from the information given.         
+                Write this one sentence such that its tone matches a persona with Interests in:
                     {self.interests}. 
-                Change this one sentence such that to exactly match specific characteristics as given:
+                Write this one sentence such that its tone matches a persona characteristics as given:
                     {self.characteristics}.
-                Change this one sentence such that it should NOT repeat any content in previous lines.
-                You are writing a captivating book.
+                Write this one sentence such that a book is being written.
             %RESTRICTIONS:
-                IMPORTANT :: Aim strictly for one easy sentence with subject object and verb."""
+                IMPORTANT :: Aim strictly for one easy short sentence with subject object and verb."""
         
         qa_chain = RetrievalQA.from_chain_type(
         model,
@@ -78,8 +79,9 @@ def init_conversation2(bot1:Bot,bot2:Bot,res):
 
 def init_conversation1(bot1:Bot,bot2:Bot,res):
     res= (f"{bot1.generate_prompt(res).split('.')[0]}.")
+    print(f"asdasd ::: {res}")
     book.append(f"Persona {bot1.name} : {res}")
-    st.text_area("persona2",value=f"Persona {bot1.name} : {res}")
+    st.text_area("PERSONA2",value=f"Persona {bot1.name} : {res}")
     print('\n'.join(book[-1:]))
     init_conversation2(bot1,bot2,res)
     return 0
@@ -107,8 +109,8 @@ def main():
     st.sidebar.header("Persona 1")
     
     persona1_name = st.sidebar.text_input("Name:", value="A")
-    persona1_characteristics = st.sidebar.text_input("Characteristics:", "It is usually angry")
-    persona1_interests = st.sidebar.text_input("Interests:", "It likes to watch action movies")
+    persona1_characteristics = st.sidebar.text_input("Characteristics:", "e.g. It is usually angry")
+    persona1_interests = st.sidebar.text_input("Interests:", "e.g It likes to fight alot")
     
     uploaded_file = st.sidebar.file_uploader("Choose a .txt file", type=["txt"], key='text1')
     if uploaded_file is not None:
@@ -125,8 +127,8 @@ def main():
     
     st.sidebar.header("Persona 2")
     persona2_name = st.sidebar.text_input("Name2:", value="B")
-    persona2_characteristics = st.sidebar.text_input("Characteristics2:", "It is usually happy")
-    persona2_interests = st.sidebar.text_input("Interests2:", "It likes to watch underage kids cartoons")
+    persona2_characteristics = st.sidebar.text_input("Characteristics2:", "e.g. It is usually happy")
+    persona2_interests = st.sidebar.text_input("Interests2:", "e.g. It likes to make friends")
     
     uploaded_file = st.sidebar.file_uploader("Choose a .txt file", type=["txt"], key='text2')
     if uploaded_file is not None:
@@ -154,7 +156,7 @@ def main():
 
 
 
-    input_text = st.text_input("You:", placeholder="Ask me anything...", key="input")
+    input_text = st.text_input("You:", placeholder="Write story starting e.g.a person goes out for fishing.", key="input")
  
     if st.button("Submit", type="primary"):
         # Generate response and append to the conversation history
